@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-deployment
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3-management
+        ports:
+        - containerPort: 5672  # RabbitMQ port
+        - containerPort: 15672  # Management UI port
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: rabbitmq
+        - name: RABBITMQ_DEFAULT_PASS
+          value: rabbitmq
+        readinessProbe:
+          exec:
+            command:
+            - rabbitmq-diagnostics
+            - "-q"
+            - ping
+          initialDelaySeconds: 10  # Delay before the first probe is run
+          periodSeconds: 5         # Interval between probes
+          timeoutSeconds: 3        # Timeout for each probe
+          failureThreshold: 6 
