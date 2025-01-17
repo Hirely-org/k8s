@@ -1,0 +1,9 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: pass-headers
+spec:
+  headers:
+    customResponseHeaders:
+      X-Forwarded-Role: "%[X-Forwarded-Role]"  # Using Traefik's syntax for header value
+      X-Forwarded-User: "%[X-Forwarded-User]"

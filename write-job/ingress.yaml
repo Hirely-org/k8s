@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: job-write-api-rule
+spec:
+  routes:
+    - match: PathPrefix(`/jobwrite`)
+      kind: Rule
+      middlewares:
+        - name: auth
+        - name: cors-middleware
+      services:
+        - name: job-write-api-service
+          port: http

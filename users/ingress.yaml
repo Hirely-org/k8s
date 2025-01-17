@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: users-api-rule
+spec:
+  routes:
+    - match: PathPrefix(`/users`)
+      kind: Rule
+      middlewares:
+        - name: auth
+        - name: cors-middleware
+        - name: pass-headers
+      services:
+        - name: users-api-service
+          port: http

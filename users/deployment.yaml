@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: job-read-api-deployment
+  name: users-deployment
   labels:
-    app: job-read-api
+    app: users
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: job-read-api
+      app: users
   template:
     metadata:
       labels:
-        app: job-read-api
+        app: users
     spec:
       containers:
-      - name: job-read-api
-        image: veljkoskrbic/hirely-read-job-api:latest
+      - name: users
+        image: veljkoskrbic/hirely-users-api:latest
         imagePullPolicy: Always
         resources:
           requests:
@@ -26,17 +26,17 @@ spec:
             memory: "256Mi"
             cpu: "500m"
         ports:
-        - containerPort: 5001
+        - containerPort: 5002
         env:
 
-        - name: DB_PASS_READ
+        - name: DB_PASS_USERS
           valueFrom:
             secretKeyRef:
-              name: db-read-mysql
+              name: db-users-mysql
               key: mysql-root-password
 
-        - name: DB_URI_READ
-          value: "mysql://root:$(DB_PASS_READ)@db-read-mysql.default.svc.cluster.local/my_database"
+        - name: DB_URI_USERS
+          value: "mysql://root:$(DB_PASS_USERS)@db-users-mysql.default.svc.cluster.local/my_database"
           # mysql.connect(process.ENV.DB_URI)
 
         - name: RABBIT_PASS

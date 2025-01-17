@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-read-api-service
+spec:
+  selector:
+    app: job-read-api
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 5001

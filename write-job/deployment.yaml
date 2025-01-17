@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-write-api-deployment
+  labels:
+    app: job-write-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: job-write-api
+  template:
+    metadata:
+      labels:
+        app: job-write-api
+    spec:
+      containers:
+      - name: job-write-api
+      # image: job-write:latest za docker image
+        image: veljkoskrbic/hirely-job-write-api:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+        env:
+        # - name: MYSQL_ROOT_PASSWORD
+        #   valueFrom: 
+        #     secretKeyRef:
+        #       name: job-write-secret
+        #       key: mysql-password
+
+        # - name: DB_URL
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: job-write-config
+        #       key: mysql-url
+
+        - name: DB_PASS_WRITE
+          valueFrom:
+            secretKeyRef:
+              name: db-write-mysql
+              key: mysql-root-password
+
+        - name: DB_URI_WRITE
+          value: "mysql://root:$(DB_PASS_WRITE)@db-write-mysql.default.svc.cluster.local/my_database"
+          # mysql.connect(process.ENV.DB_URI)
+
+        - name: RABBIT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rmq-rabbitmq
+              key: rabbitmq-password
+        
+        - name: RABBITMQ_URI
+          value: "amqp://user:$(RABBIT_PASS)@rmq-rabbitmq.default.svc.cluster.local/"
+          # rabbitmq.connect(process.ENV.RABBITMQ_URI)

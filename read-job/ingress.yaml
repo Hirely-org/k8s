@@ -1,0 +1,27 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: read-job-api-rule
+spec:
+  entryPoints:
+    - web
+  routes:
+    # Handle OPTIONS first
+    # - match: "PathPrefix(`/jobread`) && Method(`OPTIONS`)"
+    #   kind: Rule
+    #   priority: 200  # Higher priority
+    #   middlewares:
+    #     - name: cors-middleware
+    #   services:
+    #     - name: job-read-api-service
+    #       port: http
+    # Then handle other methods
+    - match: "PathPrefix(`/jobread`)"
+      kind: Rule
+      middlewares:
+        - name: cors-middleware
+        - name: auth  # Your auth middleware
+        - name: pass-headers
+      services:
+        - name: job-read-api-service
+          port: http

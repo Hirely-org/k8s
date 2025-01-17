@@ -1,0 +1,33 @@
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: traefik-dashboard
+#   namespace: kube-system
+# spec:
+#   entryPoints:
+#     - web  # Expose on HTTP (port 80)
+#   routes:
+#     - match: Host(`traefik.local`)  # Make sure this matches the domain you set in the values.yaml
+#       kind: Rule
+#       services:
+#         - name: api@internal
+#           port: 8080  # Traefik's internal API port
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik-dashboard
+spec:
+  type: ClusterIP
+  ports:
+  - name: traefik
+    port: 9000
+    targetPort: traefik
+    protocol: TCP
+  selector:
+    app.kubernetes.io/instance: traefik-kube-system
+    app.kubernetes.io/name: traefik
