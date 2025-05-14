@@ -1,0 +1,23 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: job-application-api-rule
+spec:
+  entryPoints:
+      - myapi
+  routes:
+    - match: PathPrefix(`/jobApplication`)
+      kind: Rule
+      middlewares:
+        - name: cors-middleware
+        - name: auth
+      services:
+        - name: job-application-api-service
+          port: http
+    # - match: Method(`OPTIONS`)
+    #   kind: Rule
+    #   middlewares:
+    #     - name: cors-middleware
+    #   services:
+    #     - name: job-application-api-service
+    #       port: http

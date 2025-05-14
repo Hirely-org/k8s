@@ -20,11 +20,11 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "500m"
-          limits:
             memory: "256Mi"
-            cpu: "500m"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
         ports:
         - containerPort: 5001
         env:
@@ -46,16 +46,4 @@ spec:
               key: rabbitmq-password
         
         - name: RABBITMQ_URI
-          value: "amqp://user:$(RABBIT_PASS)@rmq-rabbitmq.default.svc.cluster.local/"
-          # rabbitmq.connect(process.ENV.RABBITMQ_URI)
-        # - name: MYSQL_ROOT_PASSWORD
-        #   valueFrom: 
-        #     secretKeyRef:
-        #       name: job-read-secret
-        #       key: mysql-password
-
-        # - name: DB_URL
-        #   valueFrom:
-        #     configMapKeyRef:
-        #       name: job-read-config
-        #       key: mysql-url
+          value: "amqp://admin:$(RABBIT_PASS)@rmq-rabbitmq.default.svc.cluster.local/"

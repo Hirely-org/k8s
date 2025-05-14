@@ -46,16 +46,16 @@ spec:
               key: rabbitmq-password
         
         - name: RABBITMQ_URI
-          value: "amqp://user:$(RABBIT_PASS)@rmq-rabbitmq.default.svc.cluster.local/"
-          # rabbitmq.connect(process.ENV.RABBITMQ_URI)
-        # - name: MYSQL_ROOT_PASSWORD
-        #   valueFrom: 
-        #     secretKeyRef:
-        #       name: job-read-secret
-        #       key: mysql-password
-
-        # - name: DB_URL
-        #   valueFrom:
-        #     configMapKeyRef:
-        #       name: job-read-config
-        #       key: mysql-url
+          value: "amqp://admin:$(RABBIT_PASS)@rmq-rabbitmq.default.svc.cluster.local/"
+        - name: AUTH0_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: auth0-credentials
+              key: client-id
+        - name: AUTH0_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth0-credentials
+              key: client-secret
+        # - name: API_URL
+        #   value: "http://traefik.traefik.svc.cluster.local:5000"

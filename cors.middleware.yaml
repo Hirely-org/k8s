@@ -1,11 +1,12 @@
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: cors-middleware
 spec:
   headers:
     accessControlAllowOriginList:
-      - "*"
+      - "http://localhost:3000"
+      - "http://veljkoskrbic.com"
     accessControlAllowMethods:
       - "GET"
       - "POST"
@@ -13,10 +14,13 @@ spec:
       - "DELETE"
       - "OPTIONS"
     accessControlAllowHeaders:
-      - "*"
+      - "Content-Type"
+      - "Authorization"
+      - "X-Forwarded-Role"
+      - "X-Forwarded-User"
+    accessControlAllowCredentials: true
     accessControlExposeHeaders:
       - "X-Forwarded-Role"
       - "X-Forwarded-User"
-    accessControlAllowCredentials: false
     accessControlMaxAge: 100
     addVaryHeader: true

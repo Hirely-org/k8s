@@ -1,0 +1,189 @@
+# apiVersion: traefik.io/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: traefik-dashboard
+#   namespace: traefik
+# spec:
+#   entryPoints:
+#     - web
+#   routes:
+#     - match: Host(`ab2de2a41701e4630a3d1e2b2dde69ab-782019597.eu-central-1.elb.amazonaws.com`)
+#       kind: Rule
+#       services:
+#         - name: api@internal
+#           kind: TraefikService
+# ---
+# apiVersion: traefik.io/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: myapp
+#   namespace: default  # or your app's namespace
+# spec:
+#   entryPoints:
+#     - web
+#   routes:
+#     - match: Host(`app.1234-1234.eu-central-1.elb.amazonaws.com`)
+#       kind: Rule
+#       services:
+#         - name: myapp-service  # replace with your service name
+#           port: 80            # replace with your service port
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: traefik
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`ab2de2a41701e4630a3d1e2b2dde69ab-782019597.eu-central-1.elb.amazonaws.com`) && (PathPrefix(`/traefik`) || PathPrefix(`/api`))
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+      middlewares:
+        - name: traefik-strip-prefix
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-strip-prefix
+  namespace: traefik
+spec:
+  stripPrefix:
+    prefixes:
+      - /traefik
+
+---
+# RabbitMQ dashboard route
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rabbitmq-dashboard
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`ab2de2a41701e4630a3d1e2b2dde69ab-782019597.eu-central-1.elb.amazonaws.com`) && PathPrefix(`/rabbitmq`)
+      kind: Rule
+      services:
+        - name: rmq-rabbitmq
+          port: 15672
+      middlewares:
+        - name: rabbitmq-strip-prefix
+        - name: rabbitmq-rewrite-middleware
+---
+# Strip prefix middleware
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rabbitmq-strip-prefix
+  namespace: default
+spec:
+  stripPrefix:
+    prefixes:
+      - /rabbitmq
+    forceSlash: false
+---
+# Rewrite middleware to handle asset paths
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rabbitmq-rewrite-middleware
+  namespace: default
+spec:
+  headers:
+    customRequestHeaders:
+      X-Script-Name: "/rabbitmq"
+
+---
+# Prometheus Grafana route
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus-grafana-dashboard
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`ab2de2a41701e4630a3d1e2b2dde69ab-782019597.eu-central-1.elb.amazonaws.com`) && PathPrefix(`/prometheus-grafana`)
+      kind: Rule
+      services:
+        - name: prometheus-grafana
+          port: 80
+      middlewares:
+        - name: prometheus-grafana-strip-prefix
+        - name: prometheus-grafana-rewrite
+
+---
+# Prometheus Grafana Strip prefix middleware
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: prometheus-grafana-strip-prefix
+  namespace: default
+spec:
+  stripPrefix:
+    prefixes:
+      - /prometheus-grafana
+    forceSlash: false
+
+---
+# Prometheus Grafana Rewrite middleware
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: prometheus-grafana-rewrite
+  namespace: default
+spec:
+  headers:
+    customRequestHeaders:
+      X-Script-Name: "/prometheus-grafana"
+
+---
+# Loki Grafana route
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: loki-grafana-dashboard
+  namespace: loki-stack
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`ab2de2a41701e4630a3d1e2b2dde69ab-782019597.eu-central-1.elb.amazonaws.com`) && PathPrefix(`/loki-grafana`)
+      kind: Rule
+      services:
+        - name: loki-grafana
+          port: 80
+      middlewares:
+        - name: loki-grafana-strip-prefix
+        - name: loki-grafana-rewrite
+
+---
+# Loki Grafana Strip prefix middleware
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: loki-grafana-strip-prefix
+  namespace: loki-stack
+spec:
+  stripPrefix:
+    prefixes:
+      - /loki-grafana
+    forceSlash: false
+
+---
+# Loki Grafana Rewrite middleware
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: loki-grafana-rewrite
+  namespace: loki-stack
+spec:
+  headers:
+    customRequestHeaders:
+      X-Script-Name: "/loki-grafana"

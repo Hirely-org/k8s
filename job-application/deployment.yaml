@@ -1,23 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: job-write-api-deployment
+  name: job-application-deployment
   labels:
-    app: job-write-api
+    app: job-application
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: job-write-api
+      app: job-application
   template:
     metadata:
       labels:
-        app: job-write-api
+        app: job-application
     spec:
       containers:
-      - name: job-write-api
-      # image: job-write:latest za docker image
-        image: veljkoskrbic/hirely-job-write-api:latest
+      - name: job-application
+        image: veljkoskrbic/hirely-job-application-api:latest
         imagePullPolicy: Always
         resources:
           requests:
@@ -27,17 +26,17 @@ spec:
             memory: "256Mi"
             cpu: "500m"
         ports:
-        - containerPort: 5000
+        - containerPort: 5004
         env:
-        - name: DB_PASS_WRITE
+
+        - name: DB_PASS_JOB_APPLICATION
           valueFrom:
             secretKeyRef:
-              name: db-write-mysql
+              name: db-job-application-mysql
               key: mysql-root-password
 
-        - name: DB_URI_WRITE
-          value: "mysql://root:$(DB_PASS_WRITE)@db-write-mysql.default.svc.cluster.local/my_database"
-          # mysql.connect(process.ENV.DB_URI)
+        - name: DB_URI_JOB_APPLICATION
+          value: "mysql://root:$(DB_PASS_JOB_APPLICATION)@db-job-application-mysql.default.svc.cluster.local/my_database"
 
         - name: RABBIT_PASS
           valueFrom:
@@ -47,7 +46,5 @@ spec:
         
         - name: RABBITMQ_URI
           value: "amqp://admin:$(RABBIT_PASS)@rmq-rabbitmq.default.svc.cluster.local/"
-        
-
         # - name: API_URL
         #   value: "http://traefik.traefik.svc.cluster.local:5000"
